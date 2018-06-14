@@ -38,5 +38,4 @@ func TestSentryHook_Levels(t *testing.T) {
 	if !equal {
 		t.Error("Levels are not what they should be...")
 	}
-
 }
