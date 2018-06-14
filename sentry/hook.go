@@ -1,4 +1,4 @@
-// The logrus hook to sentry services.
+// Package sentry implements the logrus sentry hooks for sentry based logging.
 package sentry
 
 import (
@@ -7,7 +7,7 @@ import (
 	logrus "github.com/sirupsen/logrus"
 )
 
-// severityMap is a simple mapping of logrus log level to sentry log
+// SentrySeverityMap is a simple mapping of logrus log level to sentry log
 // level.
 var SentrySeverityMap = map[logrus.Level]raven.Severity{
 	logrus.DebugLevel: raven.DEBUG,
