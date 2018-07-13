@@ -2,9 +2,10 @@ package sentry
 
 import (
 	"flag"
+	"testing"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // A sentry dns made specifically for this test. Don't use elsewhere please.
@@ -21,12 +22,12 @@ func init() {
 // TODO(karel) mock interfaces and add unit tests.
 
 // Integration tests.
-func TestNewSentryHook(t *testing.T) {
+func TestNew(t *testing.T) {
 	if !integration {
 		t.Skip()
 	}
 
-	_, err := NewSentryHook(dsn)
+	_, err := New(dsn)
 	assert.NoError(t, err)
 }
 
@@ -36,7 +37,7 @@ func TestSentryHook_Fire(t *testing.T) {
 	}
 
 	event := logrus.Entry{}
-	client, _ := NewSentryHook(dsn)
+	client, _ := New(dsn)
 	err := client.Fire(&event)
 	assert.NoError(t, err)
 }
@@ -46,7 +47,7 @@ func TestSentryHook_Levels(t *testing.T) {
 		t.Skip()
 	}
 
-	client, _ := NewSentryHook(dsn)
+	client, _ := New(dsn)
 	levels := client.Levels()
 
 	assert.Equal(t, levels, []logrus.Level{

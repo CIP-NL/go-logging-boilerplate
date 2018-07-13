@@ -3,6 +3,7 @@ package sentry
 
 import (
 	"errors"
+
 	"github.com/getsentry/raven-go"
 	logrus "github.com/sirupsen/logrus"
 )
@@ -24,8 +25,8 @@ type SentryHook struct {
 	levels []logrus.Level
 }
 
-// NewSentryHook creates a sentry hook for logrus given a sentry dsn
-func NewSentryHook(dsn string) (*SentryHook, error) {
+// New creates a sentry hook for logrus given a sentry dsn
+func New(dsn string) (*SentryHook, error) {
 	client, err := raven.New(dsn)
 	return &SentryHook{
 		client: client,
