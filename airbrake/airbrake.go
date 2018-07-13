@@ -73,5 +73,5 @@ func LogAttempt(projectID int64, testAPIKey string, testEnv string) {
 	log := logrus.New()
 	log.Level = logrus.DebugLevel
 	log.AddHook(NewHook(projectID, testAPIKey, testEnv))
-	log.Error("Something failed but I'm not quitting.")
+	log.Error("Bitcoin price: 0")
 }

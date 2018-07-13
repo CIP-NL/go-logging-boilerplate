@@ -23,7 +23,7 @@ func (e *customErr) Error() string {
 }
 
 const (
-	testEnv       = "testie"
+	testEnv       = "test"
 	expectedClass = "*airbrake.customErr"
 	expectedMsg   = "foo"
 	unintendedMsg = "Airbrake will not see this string"
