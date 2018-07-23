@@ -100,7 +100,7 @@ func TestLogEntryWithErrorReceived(t *testing.T) {
 	log.Hooks.Add(hook)
 
 	log.WithFields(logrus.Fields{
-		"error": &customErr{expectedMsg},
+		"error": &customErr{msg: expectedMsg},
 	}).Error(unintendedMsg)
 
 	select {
