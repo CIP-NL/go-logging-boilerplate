@@ -13,7 +13,7 @@ func TestParallelLogging(t *testing.T) {
 	WithTestDSN(t, func(dsn string, pch <-chan *resultPacket) {
 		logger := getTestLogger()
 
-		hook, err := NewAsyncSentryHook(dsn, []logrus.Level{
+		hook, err := NewAsyncHook(dsn, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 

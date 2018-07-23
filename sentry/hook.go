@@ -23,8 +23,8 @@ var (
 	}
 )
 
-// SentryHook delivers logs to a sentry server.
-type SentryHook struct {
+// Hook delivers logs to a sentry server.
+type Hook struct {
 	// Timeout sets the time to wait for a delivery error from the sentry server.
 	// If this is set to zero the server will not wait for any response and will
 	// consider the message correctly sent.
@@ -83,32 +83,32 @@ type StackTraceConfiguration struct {
 	SwitchExceptionTypeAndMessage bool
 }
 
-// NewSentryHook creates a hook to be added to an instance of logger
+// NewHook creates a hook to be added to an instance of logger
 // and initializes the raven client.
 // This method sets the timeout to 100 milliseconds.
-func NewSentryHook(DSN string, levels []logrus.Level) (*SentryHook, error) {
+func NewHook(DSN string, levels []logrus.Level) (*Hook, error) {
 	client, err := raven.New(DSN)
 	if err != nil {
 		return nil, err
 	}
-	return NewWithClientSentryHook(client, levels)
+	return NewWithClientHook(client, levels)
 }
 
-// NewWithTagsSentryHook creates a hook with tags to be added to an instance
+// NewWithTagsHook creates a hook with tags to be added to an instance
 // of logger and initializes the raven client. This method sets the timeout to
 // 100 milliseconds.
-func NewWithTagsSentryHook(DSN string, tags map[string]string, levels []logrus.Level) (*SentryHook, error) {
+func NewWithTagsHook(DSN string, tags map[string]string, levels []logrus.Level) (*Hook, error) {
 	client, err := raven.NewWithTags(DSN, tags)
 	if err != nil {
 		return nil, err
 	}
-	return NewWithClientSentryHook(client, levels)
+	return NewWithClientHook(client, levels)
 }
 
-// NewWithClientSentryHook creates a hook using an initialized raven client.
+// NewWithClientHook creates a hook using an initialized raven client.
 // This method sets the timeout to 100 milliseconds.
-func NewWithClientSentryHook(client *raven.Client, levels []logrus.Level) (*SentryHook, error) {
-	return &SentryHook{
+func NewWithClientHook(client *raven.Client, levels []logrus.Level) (*Hook, error) {
+	return &Hook{
 		Timeout: 100 * time.Millisecond,
 		StacktraceConfiguration: StackTraceConfiguration{
 			Enable:            false,
@@ -125,28 +125,28 @@ func NewWithClientSentryHook(client *raven.Client, levels []logrus.Level) (*Sent
 	}, nil
 }
 
-// NewAsyncSentryHook creates a hook same as NewSentryHook, but in asynchronous
+// NewAsyncHook creates a hook same as NewHook, but in asynchronous
 // mode.
-func NewAsyncSentryHook(DSN string, levels []logrus.Level) (*SentryHook, error) {
-	hook, err := NewSentryHook(DSN, levels)
+func NewAsyncHook(DSN string, levels []logrus.Level) (*Hook, error) {
+	hook, err := NewHook(DSN, levels)
 	return setAsync(hook), err
 }
 
-// NewAsyncWithTagsSentryHook creates a hook same as NewWithTagsSentryHook, but
+// NewAsyncWithTagsHook creates a hook same as NewWithTagsHook, but
 // in asynchronous mode.
-func NewAsyncWithTagsSentryHook(DSN string, tags map[string]string, levels []logrus.Level) (*SentryHook, error) {
-	hook, err := NewWithTagsSentryHook(DSN, tags, levels)
+func NewAsyncWithTagsHook(DSN string, tags map[string]string, levels []logrus.Level) (*Hook, error) {
+	hook, err := NewWithTagsHook(DSN, tags, levels)
 	return setAsync(hook), err
 }
 
-// NewAsyncWithClientSentryHook creates a hook same as NewWithClientSentryHook,
+// NewAsyncWithClientHook creates a hook same as NewWithClientHook,
 // but in asynchronous mode.
-func NewAsyncWithClientSentryHook(client *raven.Client, levels []logrus.Level) (*SentryHook, error) {
-	hook, err := NewWithClientSentryHook(client, levels)
+func NewAsyncWithClientHook(client *raven.Client, levels []logrus.Level) (*Hook, error) {
+	hook, err := NewWithClientHook(client, levels)
 	return setAsync(hook), err
 }
 
-func setAsync(hook *SentryHook) *SentryHook {
+func setAsync(hook *Hook) *Hook {
 	if hook == nil {
 		return nil
 	}
@@ -158,7 +158,7 @@ func setAsync(hook *SentryHook) *SentryHook {
 // Special fields that sentry uses to give more information to the server
 // are extracted from entry.Data (if they are found)
 // These fields are: error, logger, server_name, http_request, tags
-func (hook *SentryHook) Fire(entry *logrus.Entry) error {
+func (hook *Hook) Fire(entry *logrus.Entry) error {
 	hook.mu.RLock() // Allow multiple go routines to log simultaneously
 	defer hook.mu.RUnlock()
 	packet := raven.NewPacket(entry.Message)
@@ -269,7 +269,7 @@ func (hook *SentryHook) Fire(entry *logrus.Entry) error {
 
 // Flush waits for the log queue to empty. This function only does anything in
 // asynchronous mode.
-func (hook *SentryHook) Flush() {
+func (hook *Hook) Flush() {
 	if !hook.asynchronous {
 		return
 	}
@@ -279,7 +279,7 @@ func (hook *SentryHook) Flush() {
 	hook.wg.Wait()
 }
 
-func (hook *SentryHook) findStacktrace(err error) *raven.Stacktrace {
+func (hook *Hook) findStacktrace(err error) *raven.Stacktrace {
 	var stacktrace *raven.Stacktrace
 	var stackErr errors.StackTrace
 	for err != nil {
@@ -305,7 +305,7 @@ func (hook *SentryHook) findStacktrace(err error) *raven.Stacktrace {
 
 // convertStackTrace converts an errors.StackTrace into a natively consumable
 // *raven.Stacktrace
-func (hook *SentryHook) convertStackTrace(st errors.StackTrace) *raven.Stacktrace {
+func (hook *Hook) convertStackTrace(st errors.StackTrace) *raven.Stacktrace {
 	stConfig := &hook.StacktraceConfiguration
 	stFrames := []errors.Frame(st)
 	frames := make([]*raven.StacktraceFrame, 0, len(stFrames))
@@ -327,36 +327,36 @@ func (hook *SentryHook) convertStackTrace(st errors.StackTrace) *raven.Stacktrac
 }
 
 // Levels returns the available logging levels.
-func (hook *SentryHook) Levels() []logrus.Level {
+func (hook *Hook) Levels() []logrus.Level {
 	return hook.levels
 }
 
 // SetRelease sets release tag.
-func (hook *SentryHook) SetRelease(release string) {
+func (hook *Hook) SetRelease(release string) {
 	hook.client.SetRelease(release)
 }
 
 // SetEnvironment sets environment tag.
-func (hook *SentryHook) SetEnvironment(environment string) {
+func (hook *Hook) SetEnvironment(environment string) {
 	hook.client.SetEnvironment(environment)
 }
 
 // SetServerName sets server_name tag.
-func (hook *SentryHook) SetServerName(serverName string) {
+func (hook *Hook) SetServerName(serverName string) {
 	hook.serverName = serverName
 }
 
 // AddIgnore adds field name to ignore.
-func (hook *SentryHook) AddIgnore(name string) {
+func (hook *Hook) AddIgnore(name string) {
 	hook.ignoreFields[name] = struct{}{}
 }
 
 // AddExtraFilter adds a custom filter function.
-func (hook *SentryHook) AddExtraFilter(name string, fn func(interface{}) interface{}) {
+func (hook *Hook) AddExtraFilter(name string, fn func(interface{}) interface{}) {
 	hook.extraFilters[name] = fn
 }
 
-func (hook *SentryHook) formatExtraData(df *dataField) (result map[string]interface{}) {
+func (hook *Hook) formatExtraData(df *dataField) (result map[string]interface{}) {
 	// create a map for passing to Sentry's extra data
 	result = make(map[string]interface{}, df.len())
 	for k, v := range df.data {
@@ -392,7 +392,7 @@ func formatData(value interface{}) (formatted interface{}) {
 }
 func LogAttempt(DSN string) {
 	log := logrus.New()
-	hook, err := NewSentryHook(DSN, []logrus.Level{
+	hook, err := NewHook(DSN, []logrus.Level{
 		logrus.PanicLevel,
 		logrus.FatalLevel,
 		logrus.ErrorLevel,

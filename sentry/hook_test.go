@@ -102,7 +102,7 @@ func TestServerName(t *testing.T) {
 	WithTestDSN(t, func(dsn string, pch <-chan *resultPacket) {
 		logger := getTestLogger()
 
-		hook, err := NewSentryHook(dsn, []logrus.Level{
+		hook, err := NewHook(dsn, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 		hook.SetServerName(server_name)
@@ -126,7 +126,7 @@ func TestSpecialFields(t *testing.T) {
 	WithTestDSN(t, func(dsn string, pch <-chan *resultPacket) {
 		logger := getTestLogger()
 
-		hook, err := NewSentryHook(dsn, []logrus.Level{
+		hook, err := NewHook(dsn, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 
@@ -156,7 +156,7 @@ func TestSpecialFields(t *testing.T) {
 func TestSentryHandler(t *testing.T) {
 	WithTestDSN(t, func(dsn string, pch <-chan *resultPacket) {
 		logger := getTestLogger()
-		hook, err := NewSentryHook(dsn, []logrus.Level{
+		hook, err := NewHook(dsn, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 		if err != nil {
@@ -178,7 +178,7 @@ func TestSentryWithClient(t *testing.T) {
 
 		client, _ := raven.New(dsn)
 
-		hook, err := NewWithClientSentryHook(client, []logrus.Level{
+		hook, err := NewWithClientHook(client, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 		if err != nil {
@@ -200,7 +200,7 @@ func TestSentryWithClientAndError(t *testing.T) {
 
 		client, _ := raven.New(dsn)
 
-		hook, err := NewWithClientSentryHook(client, []logrus.Level{
+		hook, err := NewWithClientHook(client, []logrus.Level{
 			logrus.ErrorLevel,
 		})
 		if err != nil {
@@ -230,7 +230,7 @@ func TestSentryTags(t *testing.T) {
 			logrus.ErrorLevel,
 		}
 
-		hook, err := NewWithTagsSentryHook(dsn, tags, levels)
+		hook, err := NewWithTagsHook(dsn, tags, levels)
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -259,7 +259,7 @@ func TestSentryFingerprint(t *testing.T) {
 		}
 		fingerprint := []string{"fingerprint"}
 
-		hook, err := NewSentryHook(dsn, levels)
+		hook, err := NewHook(dsn, levels)
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -279,7 +279,7 @@ func TestSentryFingerprint(t *testing.T) {
 func TestSentryStacktrace(t *testing.T) {
 	WithTestDSN(t, func(dsn string, pch <-chan *resultPacket) {
 		logger := getTestLogger()
-		hook, err := NewSentryHook(dsn, []logrus.Level{
+		hook, err := NewHook(dsn, []logrus.Level{
 			logrus.ErrorLevel,
 			logrus.InfoLevel,
 		})
@@ -386,7 +386,7 @@ func TestSentryStacktrace(t *testing.T) {
 }
 
 func TestAddIgnore(t *testing.T) {
-	hook := SentryHook{
+	hook := Hook{
 		ignoreFields: make(map[string]struct{}),
 	}
 
@@ -413,7 +413,7 @@ func TestAddIgnore(t *testing.T) {
 }
 
 func TestAddExtraFilter(t *testing.T) {
-	hook := SentryHook{
+	hook := Hook{
 		extraFilters: make(map[string]func(interface{}) interface{}),
 	}
 
@@ -440,7 +440,7 @@ func TestAddExtraFilter(t *testing.T) {
 }
 
 func TestFormatExtraData(t *testing.T) {
-	hook := SentryHook{
+	hook := Hook{
 		ignoreFields: make(map[string]struct{}),
 		extraFilters: make(map[string]func(interface{}) interface{}),
 	}
@@ -559,7 +559,7 @@ func (myStacktracerError) GetStacktrace() *raven.Stacktrace {
 }
 
 func TestConvertStackTrace(t *testing.T) {
-	hook := SentryHook{}
+	hook := Hook{}
 	expected := raven.NewStacktrace(0, 0, nil)
 	st := pkgerrors.New("-").(pkgErrorStackTracer).StackTrace()
 	ravenSt := hook.convertStackTrace(st)
