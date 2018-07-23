@@ -83,6 +83,29 @@ type StackTraceConfiguration struct {
 	SwitchExceptionTypeAndMessage bool
 }
 
+// Factory function to create proper hook
+func New(dsn string) *Hook {
+	hook, err := NewHook(dsn, []logrus.Level{
+		logrus.PanicLevel,
+		logrus.FatalLevel,
+		logrus.ErrorLevel,
+	})
+	if err == nil {
+		return hook
+	}
+	return nil
+}
+
+//Checks if the DSN is correct and if the sentry server is accessible
+func (hook *Hook) Verify(dsn string) bool {
+	_, err := NewHook(dsn, []logrus.Level{
+		logrus.PanicLevel,
+		logrus.FatalLevel,
+		logrus.ErrorLevel,
+	})
+	return err == nil
+}
+
 // NewHook creates a hook to be added to an instance of logger
 // and initializes the raven client.
 // This method sets the timeout to 100 milliseconds.
@@ -390,7 +413,9 @@ func formatData(value interface{}) (formatted interface{}) {
 		return value
 	}
 }
-func LogAttempt(DSN string) {
+
+// Sends a dummy error to the server
+func logAttempt(DSN string) {
 	log := logrus.New()
 	hook, err := NewHook(DSN, []logrus.Level{
 		logrus.PanicLevel,
@@ -401,4 +426,5 @@ func LogAttempt(DSN string) {
 	if err == nil {
 		log.Hooks.Add(hook)
 	}
+	log.Error("Everything is going wrong in testing")
 }

@@ -577,6 +577,6 @@ func TestLogAttempt(t *testing.T) {
 	if !integration {
 		t.Skip()
 	} else {
-		LogAttempt(DSN)
+		logAttempt(DSN)
 	}
 }
