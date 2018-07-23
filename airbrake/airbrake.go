@@ -16,6 +16,7 @@ type airbrakeHook struct {
 	Airbrake *gobrake.Notifier
 }
 
+// NewHook Returns a new Airbrake hook given the projectID, apiKey and environment
 func NewHook(projectID int64, apiKey, env string) *airbrakeHook {
 	airbrake := gobrake.NewNotifier(projectID, apiKey)
 	airbrake.AddFilter(func(notice *gobrake.Notice) *gobrake.Notice {
@@ -69,9 +70,11 @@ func (hook *airbrakeHook) Levels() []logrus.Level {
 		logrus.PanicLevel,
 	}
 }
-func LogAttempt(projectID int64, testAPIKey string, testEnv string) {
-	log := logrus.New()
-	log.Level = logrus.DebugLevel
-	log.AddHook(NewHook(projectID, testAPIKey, testEnv))
-	log.Error("Bitcoin price: 0")
-}
+
+// LogAttempt used to test error messages
+// func LogAttempt(projectID int64, testAPIKey string, testEnv string) {
+// 	log := logrus.New()
+// 	log.Level = logrus.DebugLevel
+// 	log.AddHook(NewHook(projectID, testAPIKey, testEnv))
+// 	log.Error("Bitcoin price: 0")
+// }

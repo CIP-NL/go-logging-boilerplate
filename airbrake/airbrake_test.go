@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 )
 
 type customErr struct {
@@ -63,7 +64,12 @@ func init() {
 // TestLogEntryMessageReceived checks if invoking Logrus' log.Error
 // method causes an XML payload containing the log entry message is received
 // by a HTTP server emulating an Airbrake-compatible endpoint.
+
+//Unit-tests:
 func TestLogEntryMessageReceived(t *testing.T) {
+	if integration {
+		t.Skip()
+	}
 	log := logrus.New()
 	hook := newTestHook()
 	log.Hooks.Add(hook)
@@ -86,6 +92,9 @@ func TestLogEntryMessageReceived(t *testing.T) {
 // error message returned by the Error() method on the error interface
 // rather than the logrus.Entry.Message string.
 func TestLogEntryWithErrorReceived(t *testing.T) {
+	if integration {
+		t.Skip()
+	}
 	log := logrus.New()
 	hook := newTestHook()
 	log.Hooks.Add(hook)
@@ -115,6 +124,9 @@ func TestLogEntryWithErrorReceived(t *testing.T) {
 // Only error types are supported when setting the 'error' field using
 // logrus.WithFields().
 func TestLogEntryWithNonErrorTypeNotReceived(t *testing.T) {
+	if integration {
+		t.Skip()
+	}
 	log := logrus.New()
 	hook := newTestHook()
 	log.Hooks.Add(hook)
@@ -135,6 +147,9 @@ func TestLogEntryWithNonErrorTypeNotReceived(t *testing.T) {
 }
 
 func TestLogEntryWithCustomFields(t *testing.T) {
+	if integration {
+		t.Skip()
+	}
 	log := logrus.New()
 	hook := newTestHook()
 	log.Hooks.Add(hook)
@@ -158,6 +173,9 @@ func TestLogEntryWithCustomFields(t *testing.T) {
 }
 
 func TestLogEntryWithHTTPRequestFields(t *testing.T) {
+	if integration {
+		t.Skip()
+	}
 	log := logrus.New()
 	hook := newTestHook()
 	log.Hooks.Add(hook)
@@ -189,7 +207,7 @@ func TestLogEntryWithHTTPRequestFields(t *testing.T) {
 	}
 }
 
-// Returns a new airbrakeHook with the test server proxied
+// Returns a new hook with the test server proxied
 func newTestHook() *airbrakeHook {
 	// Make a http.Client with the transport
 	httpClient := &http.Client{Transport: &FakeRoundTripper{}}
@@ -218,7 +236,7 @@ func (rt *FakeRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	noticeChan <- notice
 
 	jsonResponse := struct {
-		Id string `json:"id"`
+		ID string `json:"id"`
 	}{"1"}
 
 	sendResponse, _ := json.Marshal(jsonResponse)
@@ -230,6 +248,44 @@ func (rt *FakeRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-func TestLogAttempt(t *testing.T) {
-	LogAttempt(projectID, testAPIKey, testEnv)
+// Integration tests.
+func TestNewHook(t *testing.T) {
+	if !integration {
+		t.Skip()
+	}
+
+	hook := NewHook(projectID, testAPIKey, testEnv)
+	assert.NotEmpty(t, hook)
 }
+
+func TestFire(t *testing.T) {
+	if !integration {
+		t.Skip()
+	}
+	event := logrus.Entry{Message: "hook.Fire integration test successful"}
+	hook := NewHook(projectID, testAPIKey, testEnv)
+	err := hook.Fire(&event)
+	assert.NoError(t, err)
+}
+
+func TestLevels(t *testing.T) {
+	if !integration {
+		t.Skip()
+	}
+
+	hook := NewHook(projectID, testAPIKey, testEnv)
+	levels := hook.Levels()
+
+	assert.Equal(t, levels, []logrus.Level{
+		logrus.ErrorLevel,
+		logrus.FatalLevel,
+		logrus.PanicLevel,
+	})
+}
+
+// func TestLogAttempt(t *testing.T) {
+// 	if !integration {
+// 		t.Skip()
+// 	}
+// 	LogAttempt(projectID, testAPIKey, testEnv)
+// }
