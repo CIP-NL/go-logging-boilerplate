@@ -1,4 +1,4 @@
-package airbrakeHook
+package airbrake
 
 import (
 	"bytes"
