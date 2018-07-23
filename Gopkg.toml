@@ -24,6 +24,7 @@
 #   go-tests = true
 #   unused-packages = true
 
+required = ["github.com/golangci/golangci-lint/cmd/golangci-lint"]
 
 [[constraint]]
   branch = "master"
@@ -44,3 +45,7 @@
 [[constraint]]
   name = "github.com/airbrake/gobrake"
   version = "3.6.1"
+
+[[constraint]]
+  name = "github.com/golangci/golangci-lint"
+  version = "1.9.1"
