@@ -282,10 +282,3 @@ func TestLevels(t *testing.T) {
 		logrus.PanicLevel,
 	})
 }
-
-// func TestLogAttempt(t *testing.T) {
-// 	if !integration {
-// 		t.Skip()
-// 	}
-// 	LogAttempt(projectID, testAPIKey, testEnv)
-// }
