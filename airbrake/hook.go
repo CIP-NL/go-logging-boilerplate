@@ -10,14 +10,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// AirbrakeHook to send exceptions to an exception-tracking service compatible
+// Hook to send exceptions to an exception-tracking service compatible
 // with the Airbrake API.
-type airbrakeHook struct {
+type Hook struct {
 	Airbrake *gobrake.Notifier
 }
 
 // NewHook Returns a new Airbrake hook given the projectID, apiKey and environment
-func NewHook(projectID int64, apiKey, env string) *airbrakeHook {
+func NewHook(projectID int64, apiKey, env string) *Hook {
 	airbrake := gobrake.NewNotifier(projectID, apiKey)
 	airbrake.AddFilter(func(notice *gobrake.Notice) *gobrake.Notice {
 		if env == "development" {
@@ -26,13 +26,14 @@ func NewHook(projectID int64, apiKey, env string) *airbrakeHook {
 		notice.Context["environment"] = env
 		return notice
 	})
-	hook := &airbrakeHook{
+	hook := &Hook{
 		Airbrake: airbrake,
 	}
 	return hook
 }
 
-func (hook *airbrakeHook) Fire(entry *logrus.Entry) error {
+// Fire sends the notifyErr to airbrake
+func (hook *Hook) Fire(entry *logrus.Entry) error {
 	var notifyErr error
 	err, ok := entry.Data["error"].(error)
 	if ok {
@@ -53,17 +54,21 @@ func (hook *airbrakeHook) Fire(entry *logrus.Entry) error {
 		notice.Context[k] = fmt.Sprintf("%s", v)
 	}
 
-	hook.sendNotice(notice)
+	hook.Verify(notice)
 	return nil
 }
 
-func (hook *airbrakeHook) sendNotice(notice *gobrake.Notice) {
+// Verify checks whether the airbrake service can be used
+func (hook *Hook) Verify(notice *gobrake.Notice) bool {
 	if _, err := hook.Airbrake.SendNotice(notice); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to send error to Airbrake: %v\n", err)
+		return false
 	}
+	return true
 }
 
-func (hook *airbrakeHook) Levels() []logrus.Level {
+// Levels returns the standard levels for logrus
+func (hook *Hook) Levels() []logrus.Level {
 	return []logrus.Level{
 		logrus.ErrorLevel,
 		logrus.FatalLevel,

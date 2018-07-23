@@ -208,7 +208,7 @@ func TestLogEntryWithHTTPRequestFields(t *testing.T) {
 }
 
 // Returns a new hook with the test server proxied
-func newTestHook() *airbrakeHook {
+func newTestHook() *Hook {
 	// Make a http.Client with the transport
 	httpClient := &http.Client{Transport: &FakeRoundTripper{}}
 
