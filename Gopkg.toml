@@ -3,7 +3,7 @@
 # Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
 # for detailed Gopkg.toml documentation.
 #
-# required = ["github.com/user/thing/cmd/thing"]
+required = ["github.com/airbrake/gobrake"]
 # ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
 #
 # [[constraint]]
@@ -31,16 +31,16 @@
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "1.0.5"
+  version = "1.0.6"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.2.2"
 
 [prune]
   go-tests = true
   unused-packages = true
 
 [[constraint]]
-  name = "github.com/golangci/golangci-lint"
-  version = "1.6.1"
-
-required = [
-    "github.com/golangci/golangci-lint/cmd/golangci-lint"
-    ]
+  name = "github.com/airbrake/gobrake"
+  version = "3.6.1"
