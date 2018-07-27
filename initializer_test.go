@@ -1,11 +1,12 @@
 package logrus_hooks
 
 import (
-	"github.com/spf13/viper"
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
+
 var c Configuration
 
 func init() {
@@ -26,7 +27,7 @@ func TestGenerateHooks(t *testing.T) {
 }
 
 func TestGenerateLoggers(t *testing.T) {
-	loggers := GenerateLoggers(c)
+	loggers := GenerateLoggers(c.Logrus)
 	assert.NotEmpty(t, loggers["api_logger"])
 	assert.NotEmpty(t, loggers["store_logger"])
 

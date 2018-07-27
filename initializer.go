@@ -1,21 +1,21 @@
 package logrus_hooks
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/CIP-NL/logrus-hooks/airbrake"
 	"github.com/CIP-NL/logrus-hooks/sentry"
+	"github.com/sirupsen/logrus"
 )
 
 type Hook struct {
-	Name string `toml:"name"`
-	Type string `toml:"type"`
-	ProjectID int64 `toml:"project_id,omitempty"`
-	APIKey string `toml:"api_key,omitempty"`
+	Name        string `toml:"name"`
+	Type        string `toml:"type"`
+	ProjectID   int64  `toml:"project_id,omitempty"`
+	APIKey      string `toml:"api_key,omitempty"`
 	Environment string `toml:"environment,omitempty"`
-	Backup string `toml:"backup,omitempty"`
-	Kind string `toml:"kind,omitempty"`
-	DNS string `toml:"dns,omitempty"`
-	Level string `toml:"level,omitempty"`
+	Backup      string `toml:"backup,omitempty"`
+	Kind        string `toml:"kind,omitempty"`
+	DNS         string `toml:"dns,omitempty"`
+	Level       string `toml:"level,omitempty"`
 }
 
 type Loggers []struct {
@@ -27,8 +27,8 @@ type Loggers []struct {
 }
 
 type Logrus struct {
-	Hooks []Hook `toml:"hooks"`
-	Loggers  Loggers `toml:"loggers"`
+	Hooks   []Hook  `toml:"hooks"`
+	Loggers Loggers `toml:"loggers"`
 }
 
 // Configuration is just a wrapper used during tests.
@@ -63,7 +63,7 @@ func GenerateHooks(hooks []Hook) map[string]logrus.Hook {
 	return hks
 }
 
-func GenerateLoggers(log Logrus) map[string]*logrus.Logger{
+func GenerateLoggers(log Logrus) map[string]*logrus.Logger {
 	loggers := make(map[string]*logrus.Logger)
 
 	hks := GenerateHooks(log.Hooks)
@@ -71,10 +71,13 @@ func GenerateLoggers(log Logrus) map[string]*logrus.Logger{
 		logger := logrus.New()
 		lvl := getLevelFromString(l.Level)
 		logger.SetLevel(lvl)
-		for _, x := range l.Hooks {
-			logger.AddHook(hks[x.Name])
+
+		if len(l.Hooks) > 0 {
+			for _, x := range l.Hooks {
+				logger.AddHook(hks[x.Name])
+			}
+			loggers[l.Name] = logger
 		}
-		loggers[l.Name] = logger
 	}
 	return loggers
 }
@@ -91,7 +94,7 @@ func genSentryHook(h Hook, backups ...logrus.Hook) logrus.Hook {
 
 	switch h.Kind {
 	case "default":
-		hook =  sentry.New(h.DNS)
+		hook = sentry.New(h.DNS)
 	case "async":
 		hook, err = sentry.NewAsyncHook(h.DNS, levels)
 	default:
@@ -107,7 +110,6 @@ func genSentryHook(h Hook, backups ...logrus.Hook) logrus.Hook {
 // Allowed aliases: DEBUG, INFO, WARN, ERROR, CRITICAL
 func getLevelFromHook(h Hook) []logrus.Level {
 	lvl := []logrus.Level{logrus.DebugLevel, logrus.InfoLevel, logrus.WarnLevel, logrus.ErrorLevel, logrus.FatalLevel}
-
 
 	switch h.Level {
 	case "DEBUG":
