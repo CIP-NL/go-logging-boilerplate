@@ -26,11 +26,14 @@ type Loggers []struct {
 	}
 }
 
+type Logrus struct {
+	Hooks []Hook `toml:"hooks"`
+	Loggers  Loggers `toml:"loggers"`
+}
+
+// Configuration is just a wrapper used during tests.
 type Configuration struct {
-	Logrus struct {
-		Hooks []Hook `toml:"hooks"`
-		Loggers  Loggers `toml:"loggers"`
-	} `toml:"logrus"`
+	Logrus Logrus `toml:"logrus"`
 }
 
 func GenerateHooks(hooks []Hook) map[string]logrus.Hook {
@@ -60,11 +63,11 @@ func GenerateHooks(hooks []Hook) map[string]logrus.Hook {
 	return hks
 }
 
-func GenerateLoggers(conf Configuration) map[string]*logrus.Logger{
+func GenerateLoggers(log Logrus) map[string]*logrus.Logger{
 	loggers := make(map[string]*logrus.Logger)
 
-	hks := GenerateHooks(conf.Logrus.Hooks)
-	for _, l := range conf.Logrus.Loggers {
+	hks := GenerateHooks(log.Hooks)
+	for _, l := range log.Loggers {
 		logger := logrus.New()
 		lvl := getLevelFromString(l.Level)
 		logger.SetLevel(lvl)
