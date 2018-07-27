@@ -1,0 +1,30 @@
+[logrus]
+
+[[logrus.hooks]]
+    name = "airbrake"
+    type = "airbrake"
+    project_id = 1
+    api_key = ""
+    environment = "local"
+
+    backup = "sentry" # Name of the backup hook
+
+[[logrus.hooks]]
+    name = "sentry"
+    type = "sentry"
+    kind = "default" # Options: default, async
+    dns = ""
+    level = "WARN" # Options: DEBUG, INFO, WARN, ERROR, CRITICAL
+
+
+[[logrus.loggers]]
+    name = "api_logger"
+    level = "INFO"
+    [[logrus.loggers.hooks]]
+        name = "airbrake"
+
+[[logrus.loggers]]
+    name = "store_logger"
+    level = "CRITICAL"
+    [[logrus.loggers.hooks]]
+        name = "sentry"
