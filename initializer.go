@@ -76,8 +76,8 @@ func GenerateLoggers(log Logrus) map[string]*logrus.Logger {
 			for _, x := range l.Hooks {
 				logger.AddHook(hks[x.Name])
 			}
-			loggers[l.Name] = logger
 		}
+		loggers[l.Name] = logger
 	}
 	return loggers
 }
