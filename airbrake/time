@@ -1,0 +1,12 @@
+gobrake: 2018/07/23 16:15:52 gitRevision dir="/home/adept/go/src/github.com/CIP-NL/logrus-hooks/airbrake" failed: open /home/adept/go/src/github.com/CIP-NL/logrus-hooks/airbrake/.git/HEAD: no such file or directory
+time="2018-07-23T16:15:52+02:00" level=error msg=foo
+time="2018-07-23T16:15:52+02:00" level=error msg="Airbrake will not see this string" error=foo
+time="2018-07-23T16:15:52+02:00" level=error msg="Airbrake will not see this string" error=foo
+time="2018-07-23T16:15:52+02:00" level=error msg="Airbrake will not see this string" user_id=123
+time="2018-07-23T16:15:52+02:00" level=error msg="Airbrake will not see this string" user_id=123
+time="2018-07-23T16:15:52+02:00" level=error msg=0
+helpgoos: linux
+goarch: amd64
+pkg: github.com/CIP-NL/logrus-hooks/airbrake
+BenchmarkLog-4   	signal: interrupt
+FAIL	github.com/CIP-NL/logrus-hooks/airbrake	8.375s

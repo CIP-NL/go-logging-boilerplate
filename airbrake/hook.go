@@ -75,3 +75,11 @@ func (hook *Hook) Levels() []logrus.Level {
 		logrus.PanicLevel,
 	}
 }
+
+// LogAttempt used to test error messages
+func LogAttempt(projectID int64, testAPIKey string, testEnv string) {
+	log := logrus.New()
+	log.Level = logrus.DebugLevel
+	log.AddHook(NewHook(projectID, testAPIKey, testEnv))
+	log.Error("Bitcoin price: 0")
+}

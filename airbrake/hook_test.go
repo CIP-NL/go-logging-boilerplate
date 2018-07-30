@@ -3,6 +3,7 @@ package airbrake
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -281,4 +282,14 @@ func TestLevels(t *testing.T) {
 		logrus.FatalLevel,
 		logrus.PanicLevel,
 	})
+}
+func BenchmarkLog(b *testing.B) {
+	log := logrus.New()
+	hook := newTestHook()
+	log.Hooks.Add(hook)
+
+	for i := 0; i < b.N; i++ {
+		log.Error(i)
+		fmt.Print("help")
+	}
 }
